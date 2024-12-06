@@ -1,58 +1,60 @@
-![](./resources/official_armmbed_example_badge.png)
-# Blinky Mbed OS example
+# Dust sensor
 
-The example project is part of the [Arm Mbed OS Official Examples](https://os.mbed.com/code/) and is the [getting started example for Mbed OS](https://os.mbed.com/docs/mbed-os/latest/quick-start/index.html). It contains an application that repeatedly blinks an LED on supported [Mbed boards](https://os.mbed.com/platforms/).
+The project includes a dust sensor to determine air quality, using a 6tron board and the Mbed environment.
 
-You can build the project with all supported [Mbed OS build tools](https://os.mbed.com/docs/mbed-os/latest/tools/index.html). However, this example project specifically refers to the command-line interface tools, [Arm Mbed CLI 1](https://github.com/ARMmbed/mbed-cli#installing-mbed-cli) and [Mbed CLI 2](https://github.com/ARMmbed/mbed-tools#installation).
 
-(Note: To see a rendered example you can import into the Arm Online Compiler, please see our [import quick start](https://os.mbed.com/docs/mbed-os/latest/quick-start/online-with-the-online-compiler.html#importing-the-code).)
+## Import the project
+
+Go to https://github.com/BigYoooo/yohan and clone the project into your working directory.
+    
+    ```bash
+    $ git clone https://github.com/BigYoooo/yohan.git
+    ```
 
 ## Mbed OS build tools
 
 ### Mbed CLI 2
 Starting with version 6.5, Mbed OS uses Mbed CLI 2. It uses Ninja as a build system, and CMake to generate the build environment and manage the build process in a compiler-independent manner. If you are working with Mbed OS version prior to 6.5 then check the section [Mbed CLI 1](#mbed-cli-1).
 1. [Install Mbed CLI 2](https://os.mbed.com/docs/mbed-os/latest/build-tools/install-or-upgrade.html).
-1. From the command-line, import the example: `mbed-tools import mbed-os-example-blinky`
 1. Change the current directory to where the project was imported.
 
 ### Mbed CLI 1
 1. [Install Mbed CLI 1](https://os.mbed.com/docs/mbed-os/latest/quick-start/offline-with-mbed-cli.html).
-1. From the command-line, import the example: `mbed import mbed-os-example-blinky`
 1. Change the current directory to where the project was imported.
 
 ## Application functionality
 
-The `main()` function is the single thread in the application. It toggles the state of a digital output connected to an LED on the board.
+The application reads particulate matter (PM1.0, PM2.5, PM4.0, PM10) data from the HPMA115 sensor and sends the measurements to a LoRaWAN network server. It also handles LoRaWAN events such as message transmission and reception.
 
-**Note**: This example requires a target with RTOS support, i.e. one with `rtos` declared in `supported_application_profiles` in `targets/targets.json` in [mbed-os](https://github.com/ARMmbed/mbed-os). For non-RTOS targets (usually with small memory sizes), please use [mbed-os-example-blinky-baremetal](https://github.com/ARMmbed/mbed-os-example-blinky-baremetal) instead.
+**Note**: This example requires a target device with LoRaWAN and RTOS support. Ensure that your target is configured in `mbed_app.json` with valid LoRaWAN keys and parameters.
 
 ## Building and running
 
-1. Connect a USB cable between the USB port on the board and the host computer.
-1. Run the following command to build the example project and program the microcontroller flash memory:
 
-    * Mbed CLI 2
+1. Connect the HPMA115 sensor to the UART pins of the board and plug the board into your computer using a USB cable.
+2. Compile and flash the application onto your board:
 
+    * **Mbed CLI 2**:
     ```bash
-    $ mbed-tools compile -m <TARGET> -t <TOOLCHAIN> --flash
+    mbed-tools compile -m <TARGET> -t <TOOLCHAIN> --flash
+    ```
+    * **Mbed CLI 1**:
+    ```bash
+    mbed compile -m <TARGET> -t <TOOLCHAIN> --flash
     ```
 
-    * Mbed CLI 1
-
-    ```bash
-    $ mbed compile -m <TARGET> -t <TOOLCHAIN> --flash
-    ```
-
-Your PC may take a few minutes to compile your code.
+Your PC may take a few minutes to build the application.
 
 The binary is located at:
-* **Mbed CLI 2** - `./cmake_build/<TARGET>/develop/<TOOLCHAIN>/mbed-os-example-blinky.bin`
-* **Mbed CLI 1** - `./BUILD/<TARGET>/<TOOLCHAIN>/mbed-os-example-blinky.bin`
+- **Mbed CLI 2**: `./cmake_build/<TARGET>/develop/<TOOLCHAIN>/project.bin`
+- **Mbed CLI 1**: `./BUILD/<TARGET>/<TOOLCHAIN>/project.bin`
 
-Alternatively, you can manually copy the binary to the board, which you mount on the host computer over USB.
+Alternatively, you can manually copy the binary to the board via USB.
 
 ## Expected output
-The LED on your target turns on and off every 500 milliseconds.
+- The HPMA115 sensor starts measuring particulate matter, and the data is printed to the serial console every second.
+- The application transmits the data payload to the LoRaWAN network server at regular intervals (10 seconds by default).
+- Received messages from the server are displayed on the serial console.
 
 
 ## Troubleshooting
@@ -71,3 +73,8 @@ If you have problems, you can review the [documentation](https://os.mbed.com/doc
 The software is provided under Apache-2.0 license. Contributions to this project are accepted under the same license. Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for more info.
 
 This project contains code from other projects. The original license text is included in those source files. They must comply with our license guide.
+
+
+## Annexes
+
+![Capture d'écran des corbes des capteurs sur 5 minutes](Capture_courbes.png)
